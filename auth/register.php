@@ -1,28 +1,16 @@
 <?php
-header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+require_once '../config/db_connect.php';
+require_once '../utils/validator.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-// Perhatikan path validator.php di folder utils
-require_once '../config/db_connect.php'; 
-require_once '../utils/validator.php'; 
-
-// Cek Method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     sendResponse('error', 'Method not allowed', null, 405);
 }
 
 // Ambil Data & Sanitasi (Gunakan fungsi dari db_connect.php)
 $kode_registrasi = sanitizeInput($_POST['kode_registrasi'] ?? '');
-$username        = sanitizeInput($_POST['username'] ?? '');
-$password        = $_POST['password'] ?? '';
-$nama_lengkap    = sanitizeInput($_POST['nama_lengkap'] ?? '');
+$username = sanitizeInput($_POST['username'] ?? '');
+$password = $_POST['password'] ?? '';
+$nama_lengkap = sanitizeInput($_POST['nama_lengkap'] ?? '');
 
 // Validasi Required (Gunakan fungsi dari db_connect.php)
 $missing = validateRequired(['kode_registrasi', 'username', 'password', 'nama_lengkap'], $_POST);
@@ -32,16 +20,20 @@ if (!empty($missing)) {
 
 // Validasi Format via Validator Class
 $kode_valid = Validator::validateKodeRegistrasi($kode_registrasi);
-if (!$kode_valid['valid']) sendResponse('error', $kode_valid['message'], null, 400);
+if (!$kode_valid['valid'])
+    sendResponse('error', $kode_valid['message'], null, 400);
 
 $username_valid = Validator::validateUsername($username);
-if (!$username_valid['valid']) sendResponse('error', $username_valid['message'], null, 400);
+if (!$username_valid['valid'])
+    sendResponse('error', $username_valid['message'], null, 400);
 
 $password_valid = Validator::validatePassword($password);
-if (!$password_valid['valid']) sendResponse('error', $password_valid['message'], null, 400);
+if (!$password_valid['valid'])
+    sendResponse('error', $password_valid['message'], null, 400);
 
 $nama_valid = Validator::validateNama($nama_lengkap);
-if (!$nama_valid['valid']) sendResponse('error', $nama_valid['message'], null, 400);
+if (!$nama_valid['valid'])
+    sendResponse('error', $nama_valid['message'], null, 400);
 
 // Cek Duplikasi Database
 $stmt = $conn->prepare("SELECT id_admin FROM admin_bengkel WHERE kode_registrasi = ? OR username = ?");

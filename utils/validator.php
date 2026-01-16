@@ -184,4 +184,50 @@ class Validator
 
         return ['valid' => true, 'value' => $date->format('Y-m-d')];
     }
+
+    /**
+     * Validasi Kode Registrasi (minimal 5 karakter)
+     */
+    public static function validateKodeRegistrasi($kode)
+    {
+        if (empty($kode)) {
+            return ["valid" => false, "message" => "Kode registrasi tidak boleh kosong"];
+        }
+        if (strlen($kode) < 5) {
+            return ["valid" => false, "message" => "Kode registrasi minimal 5 karakter"];
+        }
+        return ["valid" => true, "value" => $kode];
+    }
+
+    /**
+     * Validasi Username (3-20 karakter, alphanumeric)
+     */
+    public static function validateUsername($username)
+    {
+        if (empty($username)) {
+            return ["valid" => false, "message" => "Username tidak boleh kosong"];
+        }
+        $username = trim($username);
+        if (strlen($username) < 3 || strlen($username) > 20) {
+            return ["valid" => false, "message" => "Username harus 3-20 karakter"];
+        }
+        if (!preg_match("/^[a-zA-Z0-9_]+$/", $username)) {
+            return ["valid" => false, "message" => "Username hanya boleh berisi huruf, angka, dan underscore (_)"];
+        }
+        return ["valid" => true, "value" => $username];
+    }
+
+    /**
+     * Validasi Password (minimal 6 karakter)
+     */
+    public static function validatePassword($password)
+    {
+        if (empty($password)) {
+            return ["valid" => false, "message" => "Password tidak boleh kosong"];
+        }
+        if (strlen($password) < 6) {
+            return ["valid" => false, "message" => "Password minimal 6 karakter"];
+        }
+        return ["valid" => true, "value" => $password];
+    }
 }
